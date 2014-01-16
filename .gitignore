@@ -1,3 +1,4 @@
 .vagrant
 .DS_Store
 group_vars/all
+roles/bootstrap/files/*.pub
