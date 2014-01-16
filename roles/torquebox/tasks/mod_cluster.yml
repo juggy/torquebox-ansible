@@ -1,0 +1,50 @@
+---
+- name: Download mod_cluster
+  command: chdir=/tmp wget http://downloads.jboss.org/mod_cluster//{{ mod_cluster.version }}.Final/linux-i686/mod_cluster-{{ mod_cluster.version }}.Final-linux2-x86-ssl.tar.gz
+
+- name: Untar mod_cluster
+  command: chdir=/tmp tar -xvzf mod_cluster-{{ mod_cluster.version }}.Final-linux2-x86-ssl.tar.gz
+
+- name: Copy mod_slotmem.so
+  command: cp /tmp/opt/jboss/httpd/lib/httpd/modules/mod_slotmem.so /usr/lib/apache2/modules/
+
+- name: Copy mod_proxy_cluster.so
+  command: cp /tmp/opt/jboss/httpd/lib/httpd/modules/mod_proxy_cluster.so /usr/lib/apache2/modules/
+
+- name: Copy mod_advertise.so
+  command: cp /tmp/opt/jboss/httpd/lib/httpd/modules/mod_advertise.so /usr/lib/apache2/modules/
+
+- name: Copy mod_manager.so
+  command: cp /tmp/opt/jboss/httpd/lib/httpd/modules/mod_manager.so /usr/lib/apache2/modules/
+
+- name: Clean up files in /tmp/opt
+  file: path=/tmp/opt
+        state=absent
+
+- name: Clean up files in /tmp
+  file: path=/tmp/mod_cluster-{{ mod_cluster.version }}.Final-linux2-x86-ssl.tar.gz
+        state=absent
+
+- name: Load mod_cluster into apache2
+  template: src=xxx_cluster.load
+            dest=/etc/apache2/mods-available
+
+- name: Configure mod_cluster into apache2
+  template: src=xxx_cluster.conf
+            dest=/etc/apache2/mods-available
+
+- name: Create torquebox vhost
+  template: src=torquebox.vhost
+            dest=/etc/apache2/sites-available
+
+- name: Enable the mod_cluster module
+  command: a2enmod xxx_cluster
+
+- name: Enable the proxy module
+  command: a2enmod proxy
+
+- name: Enable the proxy_ajp module
+  command: a2enmod proxy_ajp
+
+- name: Restart apache2
+  service: name=apache2 state=restarted

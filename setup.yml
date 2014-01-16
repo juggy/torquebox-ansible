@@ -1,0 +1,25 @@
+---
+- name: Bootstrap server
+  hosts: new_nodes
+  sudo: yes
+
+  roles: 
+    - bootstrap
+
+- name: 'PostgreSQL Playbook'
+  hosts: postgresql_nodes
+  sudo: yes
+
+  roles:
+    - postgresql
+    - pgbouncer
+    
+
+- name: 'Torquebox Playbook'
+  hosts: torquebox_nodes
+  sudo: yes
+
+  roles:
+    - torquebox
+    - gitreceive
+    

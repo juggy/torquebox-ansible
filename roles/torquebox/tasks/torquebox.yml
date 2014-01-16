@@ -1,0 +1,62 @@
+---
+- name: Install java
+  apt: pkg=openjdk-7-jre-headless update-cache=true state=installed
+
+- name: Download torquebox
+  command: chdir=/tmp creates=/opt/torquebox/torquebox-{{ torquebox.version }} wget http://torquebox.org/release/org/torquebox/torquebox-dist/{{ torquebox.version }}/torquebox-dist-{{ torquebox.version }}-bin.zip
+
+- name: Create torquebox dir
+  file: path=/opt/torquebox
+        owner=deploy
+        group=deploy
+        state=directory
+
+- name: Unzip torquebox
+  command: /tmp creates=/opt/torquebox/torquebox-{{ torquebox.version }} unzip -u /tmp/torquebox-dist-{{ torquebox.version }}-bin.zip -d /opt/torquebox/
+  sudo_user: deploy
+
+- name: Clean up zip file
+  file: path=/tmp/torquebox-dist-{{ torquebox.version }}-bin.zip
+        state=absent
+
+- name: Create torquebox dir
+  file: src=/opt/torquebox/torquebox-{{ torquebox.version }}
+        path=/opt/torquebox/current
+        owner=deploy
+        group=deploy
+        state=link
+
+- name: Load torquebox env vars
+  lineinfile: dest=/etc/environment
+              line="{{ item.line }}"
+              regexp="{{ item.regex }}"
+              state=present
+  with_items:
+    - { line: "export TORQUEBOX_HOME=/opt/torquebox/current", regex: "^export TORQUEBOX_HOME" }
+    # - { line: "export JBOSS_HOME=$TORQUEBOX_HOME/jboss", regex: "^export JBOSS_HOME" }
+    # - { line: "export JRUBY_HOME=$TORQUEBOX_HOME/jruby", regex: "^export JRUBY_HOME" }
+
+- name: Change PATH to include java/jruby
+  lineinfile: backrefs=yes
+              dest=/etc/environment
+              regexp='PATH=(["]*)((?!.*?{{item}}).*?)(["]*)$'
+              line="PATH=\1\2:{{item}}\3"
+  with_items:
+    - "/opt/torquebox/current/jruby/bin"
+    - "/opt/torquebox/current/jboss/bin"
+
+- name: Install backstage
+  command: creates=/opt/torquebox/current/jboss/standalone/deployments/torquebox-backstage-knob.yml /opt/torquebox/current/jruby/bin/jruby -S {{ item }}
+  sudo_user: deploy
+  with_items:
+    - gem install torquebox-backstage
+    - backstage deploy --secure={{ torquebox.backstage.admin }}:{{ torquebox.backstage.password }}
+
+- name: Create the torquebox service
+  template: src=torquebox.conf dest=/etc/init/torquebox.conf
+
+- name: Put everything under deploy user
+  file: path=/opt/torquebox owner=deploy group=deploy recurse=yes state=directory
+
+- name: Start torquebox
+  service: name=torquebox state=started enabled=yes

@@ -1,0 +1,4 @@
+LoadModule slotmem_module       /usr/lib/apache2/modules/mod_slotmem.so
+LoadModule proxy_cluster_module /usr/lib/apache2/modules/mod_proxy_cluster.so
+LoadModule advertise_module     /usr/lib/apache2/modules/mod_advertise.so
+LoadModule manager_module       /usr/lib/apache2/modules/mod_manager.so

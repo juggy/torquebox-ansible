@@ -1,0 +1,10 @@
+---
+- name: Add repository key
+  apt_key: data="{{ lookup('file', 'ACCC4CF8.asc') }}"  state=present
+  tags:
+    - apt
+
+- name: Add PostgreSQL repository
+  apt_repository: repo='{{ postgresql.repo }}' state=present
+  tags:
+    - apt

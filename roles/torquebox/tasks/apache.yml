@@ -1,0 +1,12 @@
+---
+- name: Install Apache2
+  apt: pkg=apache2 state=installed update-cache=yes
+
+- name: Start Apache2 and enable at boot
+  service: name=apache2
+           enabled=yes
+           state=started
+
+- name: Create log dir
+  file: path=/etc/apache2/logs
+        state=directory

@@ -1,0 +1,45 @@
+---
+- name: Install Postgresql server and client
+  apt: pkg={{ item }}-{{ postgresql.version }} state=installed update-cache=yes
+  register: postgresql_install
+  with_items:
+    - postgresql
+  tags:
+    - packages
+
+- name: Install development header files
+  apt: pkg={{ item }} state=installed update-cache=yes
+  when: postgresql.install_development_headers == true
+  with_items:
+    - libpq-dev
+  tags:
+    - packages
+
+- name: Install PostgreSQL config file
+  template: src=postgresql.conf
+            dest=/etc/postgresql/{{ postgresql.version }}/main/postgresql.conf
+            owner={{ postgresql.user }} group={{ postgresql.group }}
+  tags:
+    - configuration
+
+- name: Start PostgreSQL and enable at boot
+  service: name=postgresql
+           enabled=yes
+           state=started
+
+- name: Add s3 cmd
+  apt: pkg=s3cmd state=installed update-cache=yes
+
+- name: Configure backup
+  template: src=backup_pg.sh
+            dest=/opt/backup_pg.sh
+            mode=0755
+
+- name: Create backup dir
+  file: path=/tmp/backup 
+        state=directory
+
+- name: Add backup to crontab
+  cron: name="Backup DBs"
+        job="/opt/backup_pg.sh"
+        hour="0"

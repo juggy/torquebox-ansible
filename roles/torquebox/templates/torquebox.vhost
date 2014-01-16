@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+
+    ProxyPass / balancer://torquebox-balancer stickysession=JSESSIONID|jsessionid nofailover=On
+    ProxyPassReverse / balancer://torquebox-balancer
+    ProxyPreserveHost On
+
+    <Location />
+       Order deny,allow
+        Allow from All
+    </Location>
+
+    <Location /mod_cluster_manager>
+        SetHandler mod_cluster-manager
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.1
+    </Location>
+
+</VirtualHost>

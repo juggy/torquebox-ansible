@@ -1,0 +1,21 @@
+---
+- name: Download gitreceive
+  command: chdir=/usr/local/bin wget https://raw.github.com/progrium/gitreceive/master/gitreceive
+
+- name: Make gitreceive executable
+  file: path=/usr/local/bin/gitreceive mode=0755
+
+- name: Init gitreceive
+  command: gitreceive init
+
+- name: Copy receiver script
+  template: src=receiver.sh
+            dest=/home/git/receiver
+
+- name: Copy database.yml template
+  template: src=database.yml
+            dest=/home/git/database.yml
+
+- name: Add user public keys
+  script: enable-user.sh {{ item }}
+  with_items: bootstrap.user_keys
