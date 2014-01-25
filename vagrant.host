@@ -1,6 +1,8 @@
 [new_nodes]
 192.168.50.4 ansible_ssh_user=vagrant
+
 [postgresql_nodes]
 192.168.50.4 ansible_ssh_user=vagrant
+
 [torquebox_nodes]
 192.168.50.4 ansible_ssh_user=vagrant

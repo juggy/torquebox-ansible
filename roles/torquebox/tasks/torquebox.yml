@@ -4,6 +4,7 @@
 
 - name: Download torquebox
   command: chdir=/tmp creates=/opt/torquebox/torquebox-{{ torquebox.version }} wget http://torquebox.org/release/org/torquebox/torquebox-dist/{{ torquebox.version }}/torquebox-dist-{{ torquebox.version }}-bin.zip
+  sudo_user: deploy
 
 - name: Create torquebox dir
   file: path=/opt/torquebox
@@ -12,12 +13,13 @@
         state=directory
 
 - name: Unzip torquebox
-  command: /tmp creates=/opt/torquebox/torquebox-{{ torquebox.version }} unzip -u /tmp/torquebox-dist-{{ torquebox.version }}-bin.zip -d /opt/torquebox/
+  command: creates=/opt/torquebox/torquebox-{{ torquebox.version }} unzip -u /tmp/torquebox-dist-{{ torquebox.version }}-bin.zip -d /opt/torquebox/
   sudo_user: deploy
 
 - name: Clean up zip file
   file: path=/tmp/torquebox-dist-{{ torquebox.version }}-bin.zip
         state=absent
+  sudo_user: deploy
 
 - name: Create torquebox dir
   file: src=/opt/torquebox/torquebox-{{ torquebox.version }}
@@ -25,6 +27,7 @@
         owner=deploy
         group=deploy
         state=link
+  sudo_user: deploy
 
 - name: Load torquebox env vars
   lineinfile: dest=/etc/environment
@@ -56,7 +59,14 @@
   template: src=torquebox.conf dest=/etc/init/torquebox.conf
 
 - name: Put everything under deploy user
-  file: path=/opt/torquebox owner=deploy group=deploy recurse=yes state=directory
+  file: path=/opt/torquebox 
+        owner=deploy 
+        group=deploy 
+        recurse=yes 
+        state=directory
 
 - name: Start torquebox
-  service: name=torquebox state=started enabled=yes
+  service: name=torquebox 
+           enabled=yes
+           state=started 
+           
