@@ -24,7 +24,7 @@ torquebox:
   version: 3.0.1
   backstage:
     admin: porkepic
-    password: c3cube42
+    password: ******
 
 postgresql:
   version: 9.3
