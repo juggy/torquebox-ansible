@@ -27,6 +27,10 @@
            enabled=yes
            state=started
 
+- name: Create deploy postgresql user
+  shell: psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='deploy'" | grep -q 1 || createuser -A -d deploy
+  sudo_user: "{{postgresql.user}}"
+
 - name: Add s3 cmd
   apt: pkg=s3cmd state=installed update-cache=yes
 

@@ -58,6 +58,12 @@
 - name: Create the torquebox service
   template: src=torquebox.conf dest=/etc/init/torquebox.conf
 
+- name: Create the torquebox service 2
+  file: path=/etc/init/torquebox.conf
+        owner=root
+        group=root
+        mode=0644
+        
 - name: Put everything under deploy user
   file: path=/opt/torquebox 
         owner=deploy 

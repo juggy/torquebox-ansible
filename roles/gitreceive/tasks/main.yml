@@ -16,6 +16,10 @@
   template: src=database.yml
             dest=/home/git/database.yml
 
+- name: Copy load_torquebox_env.rb template
+  template: src=load_torquebox_env.rb
+            dest=/home/git/load_torquebox_env.rb
+
 - name: Add user public keys
   script: enable-user.sh {{ item }}
   with_items: bootstrap.user_keys

@@ -12,8 +12,6 @@
 
   roles:
     - postgresql
-    - pgbouncer
-    
 
 - name: 'Torquebox Playbook'
   hosts: torquebox_nodes
