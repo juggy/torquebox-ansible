@@ -44,7 +44,7 @@
   lineinfile: dest=/etc/sudoers regexp="git ALL" line="git ALL=(ALL) NOPASSWD:ALL" state=present
 
 - name: Disallow root SSH access
-  lineinfile: dest=/etc/ssh/ssh_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
   notify: Restart ssh
 
 - name: Disallow password authentication
